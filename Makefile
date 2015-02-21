@@ -6,6 +6,7 @@
 
 
 MCU = at90usb162 
+F_CPU = 8000000UL
 FORMAT = ihex
 TARGET = main
 SRC = src/$(TARGET).c
@@ -28,7 +29,7 @@ DEBUG = stabs
 CSTANDARD = -std=gnu99
 
 # Place -D or -U options here
-CDEFS =
+CDEFS = -DF_CPU=$(F_CPU)
 
 # Place -I options here
 CINCS =
