@@ -5,7 +5,7 @@
 # (GNU make, BSD make, SysV make)
 
 
-MCU = atmega128
+MCU = at90usb162 
 FORMAT = ihex
 TARGET = main
 SRC = src/$(TARGET).c
@@ -116,6 +116,9 @@ AVRDUDE = avrdude
 REMOVE = rm -f
 MV = mv -f
 
+MSG_SIZE_BEFORE = Size before: 
+MSG_SIZE_AFTER  = Size after:
+
 # Define all object files.
 OBJ = $(SRC:.c=.o) $(ASRC:.S=.o) 
 
@@ -129,7 +132,7 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 
 
 # Default target.
-all: build
+all: sizebefore build sizeafter
 
 build: elf hex eep
 
@@ -138,6 +141,18 @@ hex: $(TARGET).hex
 eep: $(TARGET).eep
 lss: $(TARGET).lss 
 sym: $(TARGET).sym
+
+# Display size of file.
+HEXSIZE = $(SIZE) --target=$(FORMAT) $(TARGET).hex
+ELFSIZE = $(SIZE) --mcu=$(MCU) --format=avr $(TARGET).elf
+
+sizebefore:
+	@if test -f $(TARGET).elf; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); \
+ 	2>/dev/null; echo; fi
+
+sizeafter:
+	@if test -f $(TARGET).elf; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); \
+	2>/dev/null; echo; fi
 
 
 # Program the device.  
@@ -179,7 +194,6 @@ extcoff: $(TARGET).elf
 # Create a symbol table from ELF output file.
 .elf.sym:
 	$(NM) -n $< > $@
-
 
 
 # Link: create ELF output file from object files.
